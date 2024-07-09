@@ -2,7 +2,6 @@
 using LibraryAPI.Domain.Entities;
 using LibraryAPI.Domain.Repositories.Interfaces;
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Configuration;
 using System.Data;
 
 namespace LibraryAPI.Infrastructure.Repositories
