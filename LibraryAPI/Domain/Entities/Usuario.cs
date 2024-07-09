@@ -8,6 +8,9 @@
         public string Endereco { get; set; }
         public string CPF { get; set; }
 
+
+        public Usuario() {}
+
         public Usuario(int id ,string nome, string telefone, string endereco, string cpf)
         {
             Id = id;

@@ -17,6 +17,8 @@ public class UsuarioDTO
     [RegularExpression(@"^\d{11}$", ErrorMessage = "CPF deve conter 11 dígitos.")]
     public string CPF { get; set; }
 
+    public UsuarioDTO() {}
+
     public UsuarioDTO(string nome, string telefone, string endereco, string cpf)
     {
         Nome = nome;

@@ -1,6 +1,7 @@
 ﻿using LibraryAPI.Domain.Interfaces;
 using LibraryAPI.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace LibraryAPI.Presentation.Controllers
@@ -17,6 +18,7 @@ namespace LibraryAPI.Presentation.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<EmprestimoDTO>>> GetAll()
         {
             try
@@ -31,6 +33,7 @@ namespace LibraryAPI.Presentation.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<EmprestimoDTO>> GetById(int id)
         {
             try
@@ -49,6 +52,7 @@ namespace LibraryAPI.Presentation.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult> Add([FromBody] EmprestimoDTO emprestimo)
         {
             if (!ModelState.IsValid)
@@ -68,6 +72,7 @@ namespace LibraryAPI.Presentation.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<ActionResult> Update(int id, [FromBody] EmprestimoDTO emprestimo)
         {
             if (id != emprestimo.Id)
@@ -93,6 +98,7 @@ namespace LibraryAPI.Presentation.Controllers
 
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<ActionResult> Delete(int id)
         {
             try

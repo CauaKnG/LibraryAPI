@@ -1,5 +1,6 @@
 ﻿using LibraryAPI.Application.Services;
 using LibraryAPI.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -17,6 +18,7 @@ namespace LibraryAPI.Presentation.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<Livro>>> GetAll()
         {
             var livro = await _livroService.GetAllAsync();
@@ -24,6 +26,7 @@ namespace LibraryAPI.Presentation.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<Livro>> GetById(int id)
         {
             var livro = await _livroService.GetByIdAsync(id);
@@ -35,6 +38,7 @@ namespace LibraryAPI.Presentation.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult> Add([FromBody] Livro livro)
         {
             if (!ModelState.IsValid)
@@ -47,6 +51,7 @@ namespace LibraryAPI.Presentation.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<ActionResult> Update(int id, [FromBody] Livro livro)
         {
             if (id != livro.Id)
@@ -72,6 +77,7 @@ namespace LibraryAPI.Presentation.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<ActionResult> Delete(int id)
         {
             var livroExistente = await _livroService.GetByIdAsync(id);
