@@ -22,3 +22,11 @@ Dapper
 SQLite
 
 API autenticada via JWT
+
+
+PARA SE LOGAR NA API UTILIZE: 
+
+{
+  "username": "teste",
+  "senha": "teste"
+}
