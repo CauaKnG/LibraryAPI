@@ -1,9 +1,8 @@
-﻿using Xunit;
+using Xunit;
 using Moq;
 using LibraryAPI.Application.Services;
 using LibraryAPI.Domain.Entities;
 using LibraryAPI.Domain.Repositories.Interfaces;
-
 
 public class LivroTests
 {
@@ -17,7 +16,7 @@ public class LivroTests
     }
 
     [Fact]
-    public async Task AdicionarNovoLivro()
+    public async Task AdicionarNovoLivro_DeveAdicionarLivro()
     {
         var novoLivro = new Livro
         {
@@ -27,14 +26,13 @@ public class LivroTests
             Genero = "Teste Genero",
             Disponivel = true
         };
-
         await _livroService.AddAsync(novoLivro);
 
         _mockLivroRepository.Verify(r => r.AddAsync(novoLivro), Times.Once);
     }
 
     [Fact]
-    public async Task ObterTodosLivros()
+    public async Task ObterTodosLivros_DeveRetornarListaDeLivros()
     {
         var livros = new List<Livro>
         {
@@ -46,8 +44,8 @@ public class LivroTests
 
         var resultado = await _livroService.GetAllAsync();
 
-        Xunit.Assert.Equal(2, resultado.Count());
-        Xunit.Assert.Contains(resultado, l => l.Titulo == "Livro 1");
-        Xunit.Assert.Contains(resultado, l => l.Titulo == "Livro 2");
+        Assert.Equal(2, resultado.Count());
+        Assert.Contains(resultado, l => l.Titulo == "Livro 1");
+        Assert.Contains(resultado, l => l.Titulo == "Livro 2");
     }
 }

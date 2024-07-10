@@ -3,6 +3,7 @@ using LibraryAPI.Domain.Entities;
 using LibraryAPI.Domain.Repositories.Interfaces;
 using Microsoft.Data.Sqlite;
 using System.Data;
+using BCrypt.Net;
 
 namespace LibraryAPI.Infrastructure.Repositories
 {
@@ -31,8 +32,7 @@ namespace LibraryAPI.Infrastructure.Repositories
             using (var dbConnection = Connection)
             {
                 const string query = "SELECT * FROM Usuario WHERE Id = @Id";
-                var usuario = await dbConnection.QuerySingleOrDefaultAsync<Usuario>(query, new { Id = id });
-                return usuario ?? throw new InvalidOperationException("Usuario não encontrado");
+                return await dbConnection.QuerySingleOrDefaultAsync<Usuario>(query, new { Id = id });
             }
         }
 
@@ -40,7 +40,7 @@ namespace LibraryAPI.Infrastructure.Repositories
         {
             using (var dbConnection = Connection)
             {
-                const string query = "INSERT INTO Usuario (Nome, Telefone, Endereco, CPF) VALUES (@Nome, @Telefone, @Endereco, @CPF)";
+                const string query = "INSERT INTO Usuario (Nome, Telefone, Endereco, CPF, Username, Senha) VALUES (@Nome, @Telefone, @Endereco, @CPF, @Username, @Senha)";
                 await dbConnection.ExecuteAsync(query, usuario);
             }
         }
@@ -49,7 +49,7 @@ namespace LibraryAPI.Infrastructure.Repositories
         {
             using (var dbConnection = Connection)
             {
-                const string query = "UPDATE Usuario SET Nome = @Nome, Telefone = @Telefone, Endereco = @Endereco, CPF = @CPF WHERE Id = @Id";
+                const string query = "UPDATE Usuario SET Nome = @Nome, Telefone = @Telefone, Endereco = @Endereco, CPF = @CPF, Username = @Username, Senha = @Senha WHERE Id = @Id";
                 await dbConnection.ExecuteAsync(query, usuario);
             }
         }
@@ -62,6 +62,23 @@ namespace LibraryAPI.Infrastructure.Repositories
                 await dbConnection.ExecuteAsync(query, new { Id = id });
             }
         }
+
+        public async Task<Usuario?> GetByUsernameAndPasswordAsync(string username, string senha)
+        {
+            using (var dbConnection = Connection)
+            {
+                const string query = "SELECT * FROM Usuario WHERE Username = @Username";
+                var usuario = await dbConnection.QuerySingleOrDefaultAsync<Usuario>(query, new { Username = username });
+
+                if (usuario != null && BCrypt.Net.BCrypt.Verify(senha, usuario.Senha))
+                {
+                    return usuario; 
+                }
+
+                return null; 
+            }
+        }
+
     }
 }
 

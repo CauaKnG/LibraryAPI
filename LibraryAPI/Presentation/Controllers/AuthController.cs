@@ -5,7 +5,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-
 namespace LibraryAPI.Controllers
 {
     [ApiController]
@@ -24,12 +23,12 @@ namespace LibraryAPI.Controllers
         [HttpPost("authorize")]
         public async Task<IActionResult> Authorize([FromBody] UserAuthorization userAuth)
         {
-            if (userAuth == null || userAuth.UserId <= 0)
+            if (userAuth == null || string.IsNullOrEmpty(userAuth.Username) || string.IsNullOrEmpty(userAuth.Senha))
             {
-                return BadRequest("User ID is required.");
+                return BadRequest("Username and Password are required.");
             }
 
-            var usuario = await _usuarioRepository.GetByIdAsync(userAuth.UserId);
+            var usuario = await _usuarioRepository.GetByUsernameAndPasswordAsync(userAuth.Username, userAuth.Senha);
             if (usuario != null)
             {
                 var token = GenerateJwtToken(usuario.Id);
@@ -49,7 +48,7 @@ namespace LibraryAPI.Controllers
                 {
                     new Claim(ClaimTypes.NameIdentifier, userId.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddHours(2),
+                Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                 Issuer = _configuration["Jwt:Issuer"],
                 Audience = _configuration["Jwt:Audience"]
@@ -61,6 +60,7 @@ namespace LibraryAPI.Controllers
 
     public class UserAuthorization
     {
-        public int UserId { get; set; }
+        public string Username { get; set; }
+        public string Senha { get; set; }
     }
 }

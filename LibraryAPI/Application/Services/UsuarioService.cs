@@ -1,4 +1,5 @@
-﻿using LibraryAPI.Application.DTOs;
+﻿using BCrypt.Net;
+using LibraryAPI.Application.DTOs;
 using LibraryAPI.Domain.Entities;
 using LibraryAPI.Domain.Interfaces;
 using LibraryAPI.Domain.Repositories.Interfaces;
@@ -23,7 +24,8 @@ namespace LibraryAPI.Application.Services
                 Nome = usuario.Nome,
                 Telefone = usuario.Telefone,
                 Endereco = usuario.Endereco,
-                CPF = usuario.CPF
+                CPF = usuario.CPF,
+                Username = usuario.Username
             }).ToList();
         }
 
@@ -40,7 +42,8 @@ namespace LibraryAPI.Application.Services
                 Nome = usuario.Nome,
                 Telefone = usuario.Telefone,
                 Endereco = usuario.Endereco,
-                CPF = usuario.CPF
+                CPF = usuario.CPF,
+                Username = usuario.Username
             };
         }
 
@@ -51,7 +54,9 @@ namespace LibraryAPI.Application.Services
                 Nome = usuarioDto.Nome,
                 Telefone = usuarioDto.Telefone,
                 Endereco = usuarioDto.Endereco,
-                CPF = usuarioDto.CPF
+                CPF = usuarioDto.CPF,
+                Username = usuarioDto.Username,
+                Senha = BCrypt.Net.BCrypt.HashPassword(usuarioDto.Senha) 
             };
             await _usuarioRepository.AddAsync(usuario);
             return usuario.Id;
@@ -59,16 +64,22 @@ namespace LibraryAPI.Application.Services
 
         public async Task UpdateAsync(int id, UsuarioDTO usuarioDto)
         {
-            var usuario = new Usuario
+            var existingUser = await _usuarioRepository.GetByIdAsync(id);
+            if (existingUser != null)
             {
-                Id = id,
-                Nome = usuarioDto.Nome,
-                Telefone = usuarioDto.Telefone,
-                Endereco = usuarioDto.Endereco,
-                CPF = usuarioDto.CPF
-            };
-            await _usuarioRepository.UpdateAsync(usuario);
+                existingUser.Nome = usuarioDto.Nome;
+                existingUser.Telefone = usuarioDto.Telefone;
+                existingUser.Endereco = usuarioDto.Endereco;
+                existingUser.CPF = usuarioDto.CPF;
+                existingUser.Username = usuarioDto.Username;
+                if (!string.IsNullOrEmpty(usuarioDto.Senha))
+                {
+                    existingUser.Senha = BCrypt.Net.BCrypt.HashPassword(usuarioDto.Senha);
+                }
+                await _usuarioRepository.UpdateAsync(existingUser);
+            }
         }
+
 
         public async Task DeleteAsync(int id)
         {
