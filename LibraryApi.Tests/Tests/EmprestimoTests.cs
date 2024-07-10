@@ -4,7 +4,8 @@ using LibraryAPI.Application.Services;
 using LibraryAPI.Domain.Entities;
 using LibraryAPI.Domain.Repositories.Interfaces;
 using LibraryAPI.Application.DTOs;
-
+using System;
+using System.Threading.Tasks;
 
 public class EmprestimoTests
 {
@@ -41,7 +42,7 @@ public class EmprestimoTests
         var emprestimo = new Emprestimo
         {
             Id = emprestimoId,
-            LivroId = 1,
+            LivroId = 1, 
             UsuarioId = 1, 
             DataEmprestimo = DateTime.UtcNow,
             DataDevolucao = DateTime.UtcNow.AddDays(14)
