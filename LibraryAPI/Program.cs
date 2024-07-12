@@ -3,15 +3,28 @@ using LibraryAPI.Domain.Interfaces;
 using LibraryAPI.Domain.Repositories.Interfaces;
 using LibraryAPI.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var Configuration = builder.Configuration;
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<ILivroRepository, LivroRepository>();
+builder.Services.AddScoped<LivroService>();
+builder.Services.AddScoped<IEmprestimoService, EmprestimoService>();
+builder.Services.AddScoped<IEmprestimoRepository, EmprestimoRepository>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.Configure<RabbitMQSettings>(Configuration.GetSection("RabbitMQ"));
+builder.Services.AddSingleton<RabbitMQPublisher>();
+builder.Services.AddHostedService<RabbitMQConsumer>();
+
+
 builder.Services.AddSwaggerGen(c =>
 {
    
@@ -45,13 +58,6 @@ builder.Services.AddSwaggerGen(c =>
 
 
 });
-
-builder.Services.AddScoped<ILivroRepository, LivroRepository>();
-builder.Services.AddScoped<LivroService>();
-builder.Services.AddScoped<IEmprestimoService, EmprestimoService>();
-builder.Services.AddScoped<IEmprestimoRepository, EmprestimoRepository>();
-builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"];
 if (string.IsNullOrEmpty(jwtKey))

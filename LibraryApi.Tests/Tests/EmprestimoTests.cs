@@ -6,16 +6,19 @@ using LibraryAPI.Domain.Repositories.Interfaces;
 using LibraryAPI.Application.DTOs;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 public class EmprestimoTests
 {
     private readonly Mock<IEmprestimoRepository> _mockEmprestimoRepository;
+    private readonly Mock<RabbitMQPublisher> _mockRabbitMQPublisher;
     private readonly EmprestimoService _emprestimoService;
 
     public EmprestimoTests()
     {
         _mockEmprestimoRepository = new Mock<IEmprestimoRepository>();
-        _emprestimoService = new EmprestimoService(_mockEmprestimoRepository.Object);
+        _mockRabbitMQPublisher = new Mock<RabbitMQPublisher>(MockBehavior.Loose, new object[] { new Mock<IOptions<RabbitMQSettings>>().Object });
+        _emprestimoService = new EmprestimoService(_mockEmprestimoRepository.Object, _mockRabbitMQPublisher.Object);
     }
 
     [Fact]
@@ -37,13 +40,13 @@ public class EmprestimoTests
     [Fact]
     public async Task DevolverLivro_DeveDevolverLivro()
     {
-        int emprestimoId = 1; 
+        int emprestimoId = 1;
 
         var emprestimo = new Emprestimo
         {
             Id = emprestimoId,
-            LivroId = 1, 
-            UsuarioId = 1, 
+            LivroId = 1,
+            UsuarioId = 1,
             DataEmprestimo = DateTime.UtcNow,
             DataDevolucao = DateTime.UtcNow.AddDays(14)
         };
@@ -54,5 +57,4 @@ public class EmprestimoTests
 
         _mockEmprestimoRepository.Verify(r => r.DeleteAsync(emprestimoId), Times.Once);
     }
-
 }

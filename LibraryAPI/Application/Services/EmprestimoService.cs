@@ -2,17 +2,21 @@
 using LibraryAPI.Domain.Interfaces;
 using LibraryAPI.Domain.Entities;
 using LibraryAPI.Domain.Repositories.Interfaces;
-
+using RabbitMQ.Client;
+using System.Text.Json;
+using static Dapper.SqlMapper;
 
 namespace LibraryAPI.Application.Services
 {
     public class EmprestimoService : IEmprestimoService
     {
         private readonly IEmprestimoRepository _emprestimoRepository;
+        private readonly RabbitMQPublisher _rabbitMQPublisher;
 
-        public EmprestimoService(IEmprestimoRepository emprestimoRepository)
+        public EmprestimoService(IEmprestimoRepository emprestimoRepository , RabbitMQPublisher rabbitMQPublisher)
         {
             _emprestimoRepository = emprestimoRepository;
+            _rabbitMQPublisher = rabbitMQPublisher;
         }
 
         public async Task<IEnumerable<EmprestimoDTO>> GetAllAsync()
@@ -65,6 +69,10 @@ namespace LibraryAPI.Application.Services
             };
 
             await _emprestimoRepository.AddAsync(emprestimo);
+
+            var message = JsonSerializer.Serialize(emprestimoDto);
+            _rabbitMQPublisher.Publish(emprestimo, "EmprestimoQueue");
+
             return emprestimo.Id;
         }
 
